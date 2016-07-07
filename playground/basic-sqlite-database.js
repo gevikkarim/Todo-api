@@ -26,50 +26,85 @@ var Todo = sequelize.define('todo', {
 		allowNull: false,
 		defaultValue: false
 	}
-})
+});
+
+var User = sequelize.define('user', {
+	email: Sequelize.STRING
+});
+
+Todo.belongsTo(User);
+User.hasMany(Todo);
+
 // this part is for puting data or syncing data in our table
 sequelize.sync({
 	// set to true is deleting the table and creating it again
 	// set to false that is by default is creating if the table 
 	// is not exiest already
-	force: true
+	// force: true
 }).then(function() {
 	console.log('Everything is synced');
-// find todo by id number
-	Todo.findById(1).then(function (todo) {
-		if (todo) {
-			console.log(todo.toJSON());
-		} else {
-			console.log('Todo not found');
-		}
-	})
-	// with our variable name this part is creating the table
-	Todo.create({
-			description: 'muck your wife'
-		}).then(function(todo) {
-			return Todo.create({
-				description: 'suck your wife'
-			});
-			// find a word in description
-		}).then(function() {
-			//return Todo.findById(1)
-			return Todo.findAll({
-				where: {
-					description: {
-						$like: '%suck%'
-					}
-				}
-			});
-		}).then(function (todos) {
-			if (todos) {
-				todos.forEach(function (todo) {
-					console.log(todo.toJSON());
-				});
-				
-			} else {
-				console.log('no todo found!');
+
+	User.findById(1).then(function(user) {
+		user.getTodos({
+			where: {
+				completed: false
 			}
-		}).catch(function(e) {
-			console.log(e);
+		}).then(function(todos) {
+			todos.forEach(function(todo) {
+				console.log(todo.toJSON());
+			});
 		});
+	});
+
+	// User.create({
+	// 	email: 'gevik@live.com'
+	// }).then(function (){
+	// 	return Todo.create({
+	// 		description: 'clean your ass'
+	// 	}).then(function (todo) {
+	// 		User.findById(1).then(function (user) {
+	// 			user.addTodo(todo);
+	// 		});
+	// 	});
+	// })
+	// find todo by id number
+	// Todo.findById(1).then(function (todo) {
+	// 	if (todo) {
+	// 		console.log(todo.toJSON());
+	// 	} else {
+	// 		console.log('Todo not found');
+	// 	}
+	// })
+	// // with our variable name this part is creating the table
+	// Todo.create({
+	// 		description: 'muck your wife'
+	// 	}).then(function(todo) {
+	// 		return Todo.create({
+	// 			description: 'suck your wife'
+	// 		});
+	// 		// find a word in description
+	// 	}).then(function() {
+	// 		//return Todo.findById(1)
+	// 		return Todo.findAll({
+	// 			where: {
+	// 				description: {
+	// 					$like: '%suck%'
+	// 				}
+	// 			}
+	// 		});
+	// 	}).then(function (todos) {
+	// 		if (todos) {
+	// 			todos.forEach(function (todo) {
+	// 				console.log(todo.toJSON());
+	// 			});
+
+	// 		} else {
+	// 			console.log('no todo found!');
+	// 		}
+	// 	}).catch(function(e) {
+	// 		console.log(e);
+	// 	});
+
+
+
 });
